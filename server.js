@@ -27,13 +27,17 @@ binance.websockets.prevDay(false, (error, response) => {
   priceUpdates[response.symbol] = response.bestBid;
 });
 
+function sendCurrData(data) {
+  console.log(data);
+  return data;
+}
+
 io.on('connection', socket => {
   console.log('New user connected');
 
   socket.on('trailing_buy', data => {});
 
   socket.on('trailing_sell', data => {
-    console.log(data);
     let userBinance = binance;
     // Stop Price and initial Price are recalculated if current Price reaches the trailing % more than initial price
     let trailingStopPrice = data.trailingSellStopPrice;
@@ -69,11 +73,18 @@ io.on('connection', socket => {
       }
       if (percentIncrease >= trail) {
         // recalculate stop and initail using trail
-
         initialPrice = newPrice;
         trailingStopPrice =
           initialPrice * (1 - this.trailingSellPercentage / 100).toFixed(8);
-        socket.emit('stopPriceIncreased', { trail, trailingStopPrice, basePrice: initialPrice });
+        socket.emit(
+          'stopPriceIncreased',
+          sendCurrData({
+            symbol,
+            trail,
+            trailingStopPrice,
+            basePrice: initialPrice
+          })
+        );
       }
     });
   });
