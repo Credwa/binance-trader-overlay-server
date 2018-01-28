@@ -32,11 +32,7 @@ io.on('connection', socket => {
 
   socket.on('trailing_buy', data => {});
 
-  socket.on('test', data => {
-    console.log(data);
-  });
   socket.on('trailing_sell', data => {
-    socket.emit('test', { data: 'test' });
     console.log(data);
     let userBinance = binance;
     // Stop Price and initial Price are recalculated if current Price reaches the trailing % more than initial price
@@ -61,7 +57,6 @@ io.on('connection', socket => {
       ).toFixed(5);
       if (newPrice <= trailingStopPrice) {
         // cancel temp order
-        console.log('cancel');
         userBinance.cancel(symbol, orderId, (error, response, symbol) => {
           //
           if (error) {
@@ -74,11 +69,11 @@ io.on('connection', socket => {
       }
       if (percentIncrease >= trail) {
         // recalculate stop and initail using trail
+
         initialPrice = newPrice;
-        console.log(initialPrice);
-        stopPrice =
+        trailingStopPrice =
           initialPrice * (1 - this.trailingSellPercentage / 100).toFixed(8);
-        console.log(stopPrice);
+        socket.emit('stopPriceIncreased', { trail, trailingStopPrice, basePrice: initialPrice });
       }
     });
   });
