@@ -28,7 +28,7 @@ let trackOrder = order => {
             100
           ).toFixed(5);
           if (newPrice <= updatedOrder.trailingSellStopPrice) {
-            // stopPriceReached(updatedOrder);
+            stopPriceReached(updatedOrder);
           } else if (percentIncrease >= updatedOrder.trail) {
             trailIncreased(updatedOrder, newPrice);
           }
