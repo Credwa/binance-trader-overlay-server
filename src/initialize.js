@@ -1,6 +1,7 @@
 const Binance = require('binance-api-node').default;
 const binance = require('node-binance-api');
 const EventEmitter = require('events');
+const sgMail = require('@sendgrid/mail');
 
 const cron = require('node-cron');
 const db = require('../db/firebase-setup.js');
@@ -8,10 +9,30 @@ const db = require('../db/firebase-setup.js');
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 let currSymbolPrice = {};
-
+sgMail.setApiKey('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');
 binance.websockets.prevDay(false, (error, response) => {
   currSymbolPrice[response.symbol] = response.bestBid;
 });
+
+let sendMail = (to, subject, html) => {
+
+  let msg = {
+    to: to,
+    from: 'do-no-reply@eliot.orders.com',
+    subject: subject,
+    text: 'text',
+    html: html
+  };
+
+  sgMail
+    .send(msg)
+    .then(data => {
+      console.log(data);
+    })
+    .catch(e => {
+      console.log(e);
+    });
+};
 
 let findActiveOrders = (apiKey, secret) => {};
 
@@ -80,6 +101,17 @@ let trailIncreased = (order, newPrice) => {
             initialPrice: newPrice
           });
         }
+        sendMail(order.email, `Eliot Order Placed On ${order.symbol} has made some gains :D`,
+        `<h4>Amount: ${order.amount}</h4>
+        </br>
+        <h4>New Price: ${initialPrice}</h4>
+        </br>
+        <h4>Trail Percentage: ${order.trail}%</h4>
+        </br>
+        <h4>New Trail Stop Price: ${trailingStopPrice}</h4>
+        </br>
+        <h4>Gain % Protection: ${order.gainProtection}</h4>
+        `)
       }
     });
 };
@@ -94,6 +126,17 @@ let cancelOrder = pData => {
         if (keyToDelete.length > 0) {
           db.refTrail.child(keyToDelete[0]).remove();
         }
+        sendMail(pData.email, `Eliot Order Placed On ${pData.symbol} has dropped to latest trail stop price :(`,
+        `<h4>Amount: ${pData.amount}</h4>
+        </br>
+        <h4>Last Price: ${pData.initialPrice}</h4>
+        </br>
+        <h4>Trail Percentage: ${pData.trail}%</h4>
+        </br>
+        <h4>Last Trail Stop Price: ${pData.trailingStopPrice}</h4>
+        </br>
+        <h4>Gain % Protection: ${pData.gainProtection}</h4>
+        `)
       }
     });
 };
@@ -184,6 +227,17 @@ let newOrder = (data, socketToClean = null) => {
   };
   trackOrder(postData);
   db.refTrail.push(postData);
+  sendMail(data.email, `New Eliot Order Placed On ${data.symbol}`,
+  `<h4>Amount: ${data.amount}</h4>
+  </br>
+  <h4>Initial Price: ${data.initialPrice}</h4>
+  </br>
+  <h4>Trail Percentage: ${data.trail}%</h4>
+  </br>
+  <h4>Current Trail Stop Price: ${data.trailingSellStopPrice}</h4>
+  </br>
+  <h4>Gain % Protection: ${data.gainProtection}</h4>
+  `)
 };
 
 let init = () => {
