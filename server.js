@@ -31,7 +31,11 @@ io.on('connection', socket => {
   socket.on('trailing_buy', data => {});
 
   socket.on('trailing_sell', data => {
-    eliotOrders.newOrder(data);
+    if (data.preBuy) {
+      eliotOrders.preOrder(data);
+    } else {
+      eliotOrders.newOrder(data);
+    }
   });
 
   socket.on('disconnect', () => {

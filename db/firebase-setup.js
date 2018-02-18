@@ -10,7 +10,6 @@ admin.initializeApp({
   }),
   databaseURL: process.env.database_URL
 });
-
 const db = admin.database();
 let refTrail= db.ref(`${process.env.db_name}/active-trailing-stop-sells`);
 let refKeys = db.ref(`${process.env.db_name}/keys`)
