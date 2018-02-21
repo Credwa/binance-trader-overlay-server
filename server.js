@@ -24,9 +24,13 @@ let io = socketIO(server);
 // });
 
 io.on('connection', socket => {
-  console.log('New user connected');
   socket.on('user_connected', data => {
     // Get active eliot orders
+    eliotOrders.findActiveOrdersByAPIKEY(data.apiKey).then(data => {
+      socket.emit('active_orders', data);
+    }).catch(e => {
+      console.log(e);
+    })
   });
   socket.on('trailing_buy', data => {});
 
@@ -37,6 +41,11 @@ io.on('connection', socket => {
       eliotOrders.newOrder(data);
     }
   });
+
+  socket.on('cancel_order', data => {
+    console.log(data);
+    eliotOrders.cancelOrder(data);
+  })
 
   socket.on('disconnect', () => {
     console.log('Disconnected from server');
