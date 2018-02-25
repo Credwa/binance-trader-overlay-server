@@ -9,9 +9,7 @@ const db = require('../db/firebase-setup.js');
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 let currSymbolPrice = {};
-sgMail.setApiKey(
-  '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'
-);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 binance.websockets.prevDay(false, (error, response) => {
   currSymbolPrice[response.symbol] = response.bestBid;
 });
@@ -45,9 +43,11 @@ let findActiveOrdersByAPIKEY = (apiKey, secret) => {
       .equalTo(apiKey)
       .once('value', data => {
         resolve(data.val());
-      }).then((res) => {
+      })
+      .then(res => {
         console.log(1);
-      }).catch(e => {
+      })
+      .catch(e => {
         reject('No active orders');
       });
   });
@@ -88,19 +88,21 @@ let stopPriceReached = data => {
   cancelOrder(data);
 
   // sell
-  newClient
-    .order({
-      symbol: data.symbol + 'BTC',
-      side: 'SELL',
-      quantity: data.amount,
-      type: 'MARKET'
-    })
-    .then(res => {
-      console.log(res);
-    })
-    .catch(e => {
-      console.log(e);
-    });
+  if (!data.test) {
+    newClient
+      .order({
+        symbol: data.symbol + 'BTC',
+        side: 'SELL',
+        quantity: data.amount,
+        type: 'MARKET'
+      })
+      .then(res => {
+        console.log(res);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  }
 };
 
 let trailIncreased = (order, newPrice) => {
@@ -120,7 +122,7 @@ let trailIncreased = (order, newPrice) => {
         }
         sendMail(
           order.email,
-          `Eliot Order Placed On ${order.symbol} has made some gains :D`,
+          `${data.test ? 'Test': ''} Eliot Order Placed On ${order.symbol} has made some gains :D`,
           `<h4>Amount: ${order.amount}</h4>
         </br>
         <h4>New Price: ${initialPrice}</h4>
@@ -148,7 +150,7 @@ let cancelOrder = pData => {
         }
         sendMail(
           pData.email,
-          `Eliot Order Placed On ${
+          `${data.test ? 'Test': ''} Eliot Order Placed On ${
             pData.symbol
           } has dropped to latest trail stop price :(`,
           `<h4>Amount: ${pData.amount}</h4>
@@ -163,6 +165,9 @@ let cancelOrder = pData => {
         `
         );
       }
+    })
+    .catch(e => {
+      console.log(e);
     });
 };
 
@@ -254,7 +259,7 @@ let newOrder = (data, socketToClean = null) => {
   db.refTrail.push(postData);
   sendMail(
     data.email,
-    `New Eliot Order Placed On ${data.symbol}`,
+    `New ${data.test ? 'Test': ''} Eliot Order Placed On ${data.symbol}`,
     `<h4>Amount: ${data.amount}</h4>
   </br>
   <h4>Initial Price: ${data.initialPrice}</h4>
@@ -273,4 +278,10 @@ let init = () => {
   // useful for when doing updates and backend restarts
 };
 
-module.exports = { newOrder, preOrder, init, findActiveOrdersByAPIKEY, cancelOrder };
+module.exports = {
+  newOrder,
+  preOrder,
+  init,
+  findActiveOrdersByAPIKEY,
+  cancelOrder
+};
