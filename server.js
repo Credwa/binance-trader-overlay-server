@@ -60,4 +60,8 @@ server.listen(port, () => {
   console.log(`Server is up on port ${port}`);
 });
 
+app.get('/', (req, res) => {
+  res.send('Welcome!\n');
+})
+
 module.exports = { app };
