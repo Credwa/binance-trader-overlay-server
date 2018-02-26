@@ -20,7 +20,7 @@ let sendMail = (to, subject, html) => {
   }
   let msg = {
     to: to,
-    from: 'do-no-reply@eliot.orders.com',
+    from: 'do-not-reply@eliot.orders.com',
     subject: subject,
     text: 'text',
     html: html
@@ -159,7 +159,7 @@ let cancelOrder = pData => {
         </br>
         <h4>Trail Percentage: ${pData.trail}%</h4>
         </br>
-        <h4>Last Trail Stop Price: ${pData.trailingStopPrice}</h4>
+        <h4>Last Trail Stop Price: ${pData.trailingSellStopPrice}</h4>
         </br>
         <h4>Gain % Protection: ${pData.gainProtection}</h4>
         `
