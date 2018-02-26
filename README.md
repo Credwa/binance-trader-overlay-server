@@ -54,14 +54,11 @@ Fill required variables in json file db_name can be anything the rest are found 
 {
   "development": {
     "client_email": "",
-    "client_id": "",
     "database_URL": "",
     "db_name": "",
     "private_key": "",
-    "private_key_id": "",
     "project_id": "",
     "SENDGRID_API_KEY": "",
-    "type": ""
   }
 }
 ```
