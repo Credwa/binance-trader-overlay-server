@@ -280,9 +280,11 @@ let init = () => {
   db.refTrail
     .once('value', data => {
       let myData = data.val();
-      Object.keys(myData).forEach(val => {
-        trackOrder(myData[val]);
-      });
+      if (myData) {
+        Object.keys(myData).forEach(val => {
+          trackOrder(myData[val]);
+        });
+      }
     })
     .then(res => {
       console.log();
