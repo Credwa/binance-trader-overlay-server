@@ -75,6 +75,8 @@ let trackOrder = order => {
             trailIncreased(updatedOrder, newPrice);
           }
         }
+      }).catch(e => {
+        console.log(e);
       });
   });
 };
@@ -137,6 +139,8 @@ let trailIncreased = (order, newPrice) => {
         `
         );
       }
+    }).catch(e => {
+      console.log(e);
     });
 };
 
