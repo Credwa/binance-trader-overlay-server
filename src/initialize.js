@@ -29,7 +29,7 @@ let sendMail = (to, subject, html) => {
   sgMail
     .send(msg)
     .then(data => {
-      console.log(data);
+      let temp = data;
     })
     .catch(e => {
       console.log(e);
@@ -45,7 +45,7 @@ let findActiveOrdersByAPIKEY = (apiKey, secret) => {
         resolve(data.val());
       })
       .then(res => {
-        console.log(1);
+        console.log();
       })
       .catch(e => {
         reject('No active orders');
@@ -97,7 +97,7 @@ let stopPriceReached = data => {
         type: 'MARKET'
       })
       .then(res => {
-        console.log(res);
+        let temp = res;
       })
       .catch(e => {
         console.log(e);
@@ -122,7 +122,9 @@ let trailIncreased = (order, newPrice) => {
         }
         sendMail(
           order.email,
-          `${data.test ? 'Test': ''} Eliot Order Placed On ${order.symbol} has made some gains :D`,
+          `${data.test ? 'Test' : ''} Eliot Order Placed On ${
+            order.symbol
+          } has made some gains :D`,
           `<h4>Amount: ${order.amount}</h4>
         </br>
         <h4>New Price: ${initialPrice}</h4>
@@ -150,7 +152,7 @@ let cancelOrder = pData => {
         }
         sendMail(
           pData.email,
-          `${data.test ? 'Test': ''} Eliot Order Placed On ${
+          `${data.test ? 'Test' : ''} Eliot Order Placed On ${
             pData.symbol
           } has dropped to latest trail stop price :(`,
           `<h4>Amount: ${pData.amount}</h4>
@@ -199,7 +201,6 @@ let preOrder = data => {
           ) {
             if (msg.newClientOrderId === orderId) {
               // pass optional parameter to clean websocket
-              console.log('creating new order after limit buy');
               newOrder(data, clean);
               // myEmitter.emit('closeSocket', clean);
             }
@@ -227,7 +228,6 @@ let preOrder = data => {
           ) {
             if (msg.newClientOrderId === orderId) {
               // pass optional parameter to clean websocket
-              console.log('creating new order after market buy');
               newOrder(data, clean);
               // myEmitter.emit('closeSocket', clean);
             }
@@ -260,7 +260,7 @@ let newOrder = (data, socketToClean = null) => {
   db.refTrail.push(postData);
   sendMail(
     data.email,
-    `New ${data.test ? 'Test': ''} Eliot Order Placed On ${data.symbol}`,
+    `New ${data.test ? 'Test' : ''} Eliot Order Placed On ${data.symbol}`,
     `<h4>Amount: ${data.amount}</h4>
   </br>
   <h4>Initial Price: ${data.initialPrice}</h4>
@@ -277,12 +277,19 @@ let newOrder = (data, socketToClean = null) => {
 let init = () => {
   // starts tracking for all orders in database on backend start
   // useful for when doing updates and backend restarts
-  db.refTrail.once('value', data => {
-    let myData = data.val();
-    Object.keys(myData).forEach((val) => {
-      trackOrder(myData[val]);
+  db.refTrail
+    .once('value', data => {
+      let myData = data.val();
+      Object.keys(myData).forEach(val => {
+        trackOrder(myData[val]);
+      });
     })
-  })
+    .then(res => {
+      console.log();
+    })
+    .catch(e => {
+      console.log(e);
+    });
 };
 
 module.exports = {
