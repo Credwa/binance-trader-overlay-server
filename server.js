@@ -13,15 +13,7 @@ let app = express();
 let server = http.createServer(app);
 let io = socketIO(server);
 
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE');
-//   res.header(
-//     'Access-Control-Allow-Headers',
-//     'Origin, X-Requested-With, Content-Type, Accept'
-//   );
-//   next();
-// });
+eliotOrders.init();
 
 io.on('connection', socket => {
   socket.on('user_connected', data => {

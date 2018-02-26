@@ -156,6 +156,7 @@ let cancelOrder = pData => {
           `<h4>Amount: ${pData.amount}</h4>
         </br>
         <h4>Last Price: ${pData.initialPrice}</h4>
+        <h4>First Price: ${pData.start.firstPrice}</h4>
         </br>
         <h4>Trail Percentage: ${pData.trail}%</h4>
         </br>
@@ -276,6 +277,12 @@ let newOrder = (data, socketToClean = null) => {
 let init = () => {
   // starts tracking for all orders in database on backend start
   // useful for when doing updates and backend restarts
+  db.refTrail.once('value', data => {
+    let myData = data.val();
+    Object.keys(myData).forEach((val) => {
+      trackOrder(myData[val]);
+    })
+  })
 };
 
 module.exports = {
