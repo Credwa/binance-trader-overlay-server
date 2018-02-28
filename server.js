@@ -29,7 +29,9 @@ io.on('connection', socket => {
   socket.on('trailing_sell', data => {
     if (data.preBuy) {
       if (data.test) {
-        eliotOrders.newOrder(data);
+        let tempData = data;
+        tempData.amount = data.preBuy.amount;
+        eliotOrders.newOrder(tempData);
       } else {
         eliotOrders.preOrder(data);
       }
