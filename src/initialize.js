@@ -120,6 +120,8 @@ let trailIncreased = (order, newPrice) => {
           db.refTrail.child(keyToUpdate[0]).update({
             trailingSellStopPrice: trailingStopPrice,
             initialPrice: newPrice
+          }).catch(e => {
+            console.log(e);
           });
         }
         sendMail(
@@ -152,7 +154,9 @@ let cancelOrder = pData => {
       if (data) {
         let keyToDelete = Object.keys(data.val());
         if (keyToDelete.length > 0) {
-          db.refTrail.child(keyToDelete[0]).remove();
+          db.refTrail.child(keyToDelete[0]).remove().catch(e => {
+            console.log(e);
+          });
         }
         sendMail(
           pData.email,
