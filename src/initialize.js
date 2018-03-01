@@ -60,7 +60,7 @@ let trackOrder = order => {
       .orderByChild('key')
       .equalTo(order.key)
       .once('value', data => {
-        if (data) {
+        if (data.val()) {
           let dbOrder = data.val();
           let updatedOrder = dbOrder[Object.keys(dbOrder)[0]];
           let newPrice = currSymbolPrice[order.symbol + 'BTC'];
